@@ -4,8 +4,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.json.simple.JSONObject;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.DataProvider;
+import org.testng.ITestContext;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -16,10 +15,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class Post_Delete_Put_example{
 
-    PrintWriter printWriter = null;
-    FileWriter fileWriter = null;
     StringBuilder stringBuilder = new StringBuilder();
-    String outputfilepath = "/home/roshni/IdeaProjects/ApiTesting/src/test/output/";
+    File file = null;
+    FileWriter fileWriter = null;
 
     public Post_Delete_Put_example() throws IOException {
     }
@@ -42,8 +40,10 @@ public class Post_Delete_Put_example{
 
     }
 
-    @Test(invocationCount = 100, threadPoolSize = 5)
-    public void getResponse() throws FileNotFoundException {
+    @Test(invocationCount = 100)
+    public void getResponse(ITestContext testContext) throws IOException {
+
+        //int currentCount = testContext.getAllTestMethods()[0].getCurrentInvocationCount();
 
         Response response = expect().
                 statusCode(200).
@@ -55,13 +55,17 @@ public class Post_Delete_Put_example{
 
         System.out.println("Response time: "+ response.getTimeIn(TimeUnit.MILLISECONDS));
 
-        response.statusCode();
-
-        printWriter = new PrintWriter(new File(outputfilepath + "test3.csv"));
+        //stringBuilder.append("Response"+",");
+        //stringBuilder.append("Response time" + "\n");
+        //stringBuilder.append(currentCount + ",");
         stringBuilder.append(response.toString() + ",");
-        stringBuilder.append(response.getTimeIn(TimeUnit.MILLISECONDS) + "\n");
-        printWriter.write(stringBuilder.toString());
-        printWriter.close();
+        stringBuilder.append(response.getTimeIn(TimeUnit.MILLISECONDS) + ",");
+        stringBuilder.append(response.statusCode() + "\n");
+        file = new File("/home/roshni/IdeaProjects/ApiTesting/src/test/output/test1.csv");
+        fileWriter = new FileWriter(file);
+        fileWriter.write(stringBuilder.toString());
+        fileWriter.close();
+
 
     }
 
