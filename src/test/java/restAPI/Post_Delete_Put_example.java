@@ -5,8 +5,10 @@ import io.restassured.specification.RequestSpecification;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.json.simple.JSONObject;
+import org.junit.After;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -28,6 +30,7 @@ public class Post_Delete_Put_example{
     StringBuilder stringBuilder = new StringBuilder();
     File file = null;
     FileWriter fileWriter = null;
+    String url = "http://localhost:3000/posts/1";
 
     public Post_Delete_Put_example() throws IOException {
     }
@@ -38,13 +41,13 @@ public class Post_Delete_Put_example{
         request.header("Content-Type", "application/json");
 
         JSONObject json = new JSONObject();
-        json.put("id", "2");
+        json.put("id", "3");
         json.put("title", "Selenium Webdriver");
         json.put("author", "Learn automation");
 
         request.body(json.toJSONString());
 
-        Response response = request.post("http://ec2-18-205-237-120.compute-1.amazonaws.com:8080/asyncapi/nav2");
+        Response response = request.post("http://localhost:3000/posts/");
 
         Assert.assertEquals(response.getStatusCode(), 201);
 
@@ -65,20 +68,18 @@ public class Post_Delete_Put_example{
         };
     }
 
-    @Test(invocationCount = 5, dataProvider = "inputURL")
-    public void getResponse(ITestContext testContext, String url) throws IOException {
+    @Test(invocationCount = 5)//, dataProvider = "inputURL")
+    public void getResponse(ITestContext testContext) throws IOException {
 
         int currentCount = testContext.getAllTestMethods()[0].getCurrentInvocationCount();
-        String baseurl = "http://localhost:3000";
-        //String url = "/posts/1";
 
         Response response = expect().
                 statusCode(200).
                 body("id", equalTo(1),
                         "title", equalTo("json-server"),
                         "author", equalTo("typicode")).
-                given().
-                    parameters("url", url).
+                //given().
+                  //  parameters("url", url).
                 when().
                 get(url);
 
@@ -88,7 +89,7 @@ public class Post_Delete_Put_example{
         stringBuilder.append(response.getTimeIn(TimeUnit.MILLISECONDS) + ",");
         stringBuilder.append(response.statusCode() + "\n");
         file = new File("src/test/output/output_"+date+".csv");
-        fileWriter = new FileWriter(file);
+        fileWriter = new FileWriter(file, true);
         fileWriter.write(stringBuilder.toString());
         fileWriter.close();
     }
@@ -102,6 +103,37 @@ public class Post_Delete_Put_example{
                 .get("http://ec2-18-205-237-120.compute-1.amazonaws.com:8080/asyncapi/nav2");
         System.out.println("Response Time: "+response.getTimeIn(TimeUnit.MILLISECONDS));
     }
+
+    /*
+    @AfterTest
+    public static void lastFileModified() throws IOException {
+        String dir = "src/test/output/";
+        File fl = new File(dir);
+        File[] files = fl.listFiles(new FileFilter() {
+            public boolean accept(File file) {
+                return file.isFile();
+            }
+        });
+        long lastMod = Long.MIN_VALUE;
+        File choice = null;
+        for (File file : files) {
+            if (file.lastModified() > lastMod) {
+                choice = file;
+                lastMod = file.lastModified();
+            }
+        }
+        System.out.println("Last modified: "+ choice.getPath());
+
+        File f = new File(choice.getPath());
+        if(f.exists()) {
+            FileWriter fileW = new FileWriter(f);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Response, Response Time(millisec), Status code");
+            fileW.write(sb.toString());
+            fileW.close();
+        }
+
+    }*/
 
 }
 
