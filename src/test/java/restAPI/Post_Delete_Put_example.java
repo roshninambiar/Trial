@@ -62,7 +62,6 @@ public class Post_Delete_Put_example{
         HSSFWorkbook wb = new HSSFWorkbook(fis);
         HSSFSheet sheet = wb.getSheetAt(0);
         String url = sheet.getRow(0).getCell(0).getStringCellValue();
-        //String urlData[][] = new String["h"]["n"];
         return new String[][]{
                 {url}
         };
@@ -95,7 +94,7 @@ public class Post_Delete_Put_example{
         fileWriter.close();
 
         //Capturing response in csv file
-        File responseFile = new File("src/test/response/resonse_"+date+".csv");
+        File responseFile = new File("src/test/response/response_"+date+".csv");
         FileWriter responseFileWriter = new FileWriter(responseFile);
         String responsebody = response.getBody().asString();
         String nospace = responsebody.replaceAll("\n","");
@@ -129,6 +128,7 @@ public class Post_Delete_Put_example{
     }
 
     /*
+    //For appending header
     @AfterTest
     public static void lastFileModified() throws IOException {
         String dir = "src/test/output/";
