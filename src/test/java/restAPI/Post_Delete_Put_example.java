@@ -2,18 +2,28 @@ package restAPI;
 
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.*;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class Post_Delete_Put_example{
+
+    DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss");
+    LocalDateTime timenow = LocalDateTime.now();
+    String date = datetimeformatter.format(timenow);
 
     StringBuilder stringBuilder = new StringBuilder();
     File file = null;
@@ -40,33 +50,59 @@ public class Post_Delete_Put_example{
 
     }
 
-    @Test(invocationCount = 100)
-    public void getResponse(ITestContext testContext) throws IOException {
+    @DataProvider(name= "inputURL")
+    public Object[][] getExcel() throws IOException {
 
-        //int currentCount = testContext.getAllTestMethods()[0].getCurrentInvocationCount();
+        String inputFilePath = "src/test/input/jsonserver.xls";
+        File file = new File(inputFilePath);
+        FileInputStream fis = new FileInputStream(file);
+        HSSFWorkbook wb = new HSSFWorkbook(fis);
+        HSSFSheet sheet = wb.getSheetAt(0);
+        String url = sheet.getRow(0).getCell(0).getStringCellValue();
+        //String urlData[][] = new String["h"]["n"];
+        return new String[][]{
+                {url}
+        };
+    }
+
+    @Test(invocationCount = 5, dataProvider = "inputURL")
+    public void getResponse(ITestContext testContext, String url) throws IOException {
+
+        int currentCount = testContext.getAllTestMethods()[0].getCurrentInvocationCount();
+        String baseurl = "http://localhost:3000";
+        //String url = "/posts/1";
 
         Response response = expect().
                 statusCode(200).
                 body("id", equalTo(1),
                         "title", equalTo("json-server"),
                         "author", equalTo("typicode")).
+                given().
+                    parameters("url", url).
                 when().
-                get("http://localhost:3000/posts/1");
+                get(url);
 
         System.out.println("Response time: "+ response.getTimeIn(TimeUnit.MILLISECONDS));
 
-        //stringBuilder.append("Response"+",");
-        //stringBuilder.append("Response time" + "\n");
-        //stringBuilder.append(currentCount + ",");
-        stringBuilder.append(response.toString() + ",");
+        stringBuilder.append(response.getBody().asString() + ",");
         stringBuilder.append(response.getTimeIn(TimeUnit.MILLISECONDS) + ",");
         stringBuilder.append(response.statusCode() + "\n");
-        file = new File("/home/roshni/IdeaProjects/ApiTesting/src/test/output/test1.csv");
+        file = new File("src/test/output/output_"+date+".csv");
         fileWriter = new FileWriter(file);
         fileWriter.write(stringBuilder.toString());
         fileWriter.close();
+    }
 
-
+    @Test
+    public void getResponseFromEc2(){
+        Response response = expect().
+                statusCode(200).
+                body("responseCode", equalTo(200)).
+                when()
+                .get("http://ec2-18-205-237-120.compute-1.amazonaws.com:8080/asyncapi/nav2");
+        System.out.println("Response Time: "+response.getTimeIn(TimeUnit.MILLISECONDS));
     }
 
 }
+
+///home/roshni/IdeaProjects/ApiTesting/src
