@@ -30,7 +30,7 @@ public class Post_Delete_Put_example{
     StringBuilder stringBuilder = new StringBuilder();
     File file = null;
     FileWriter fileWriter = null;
-    String url = "http://localhost:3000/posts/1";
+    String url = "http://localhost:3000/posts";
 
     public Post_Delete_Put_example() throws IOException {
     }
@@ -41,9 +41,9 @@ public class Post_Delete_Put_example{
         request.header("Content-Type", "application/json");
 
         JSONObject json = new JSONObject();
-        json.put("id", "3");
-        json.put("title", "Selenium Webdriver");
-        json.put("author", "Learn automation");
+        json.put("id", "4");
+        json.put("title", "2adpro");
+        json.put("author", "Todd");
 
         request.body(json.toJSONString());
 
@@ -68,30 +68,54 @@ public class Post_Delete_Put_example{
         };
     }
 
-    @Test(invocationCount = 5)//, dataProvider = "inputURL")
+    @Test(invocationCount = 2)//, dataProvider = "inputURL")
     public void getResponse(ITestContext testContext) throws IOException {
+        String header = "";
+        String body = "";
 
         int currentCount = testContext.getAllTestMethods()[0].getCurrentInvocationCount();
 
         Response response = expect().
                 statusCode(200).
-                body("id", equalTo(1),
-                        "title", equalTo("json-server"),
-                        "author", equalTo("typicode")).
+                //body("id", equalTo(1),
+                 //       "title", equalTo("json-server"),
+                 //       "author", equalTo("typicode")).
                 //given().
                   //  parameters("url", url).
                 when().
                 get(url);
 
-        System.out.println("Response time: "+ response.getTimeIn(TimeUnit.MILLISECONDS));
-
+        //Capturing Response, Response time, Status code
         stringBuilder.append(response.getBody().asString() + ",");
         stringBuilder.append(response.getTimeIn(TimeUnit.MILLISECONDS) + ",");
         stringBuilder.append(response.statusCode() + "\n");
         file = new File("src/test/output/output_"+date+".csv");
-        fileWriter = new FileWriter(file, true);
+        fileWriter = new FileWriter(file);
         fileWriter.write(stringBuilder.toString());
         fileWriter.close();
+
+        //Capturing response in csv file
+        File responseFile = new File("src/test/response/resonse_"+date+".csv");
+        FileWriter responseFileWriter = new FileWriter(responseFile);
+        String responsebody = response.getBody().asString();
+        String nospace = responsebody.replaceAll("\n","");
+        String nobrace = nospace.replaceAll("[\\[\\]{}]", "");
+        String resposebodymod = nobrace.replaceAll(":", ",");
+        String arr[] = resposebodymod.split(",");
+        for(int i=0; i<arr.length; i++){
+            if(i%2==0){
+                header = header + arr[i] + ",";
+            }
+            else{
+                body = body + arr[i] + ",";
+            }
+        }
+        String finalresponse = header + "\n" + body;
+        System.out.println(finalresponse);
+        responseFileWriter.write(finalresponse);
+        responseFileWriter.close();
+
+
     }
 
     @Test
