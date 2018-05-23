@@ -1,0 +1,13 @@
+GET, http://localhost:3000, /posts/1, ," {
+  ""id"": 1,
+  ""title"": ""json-server"",
+  ""author"": ""typicode""
+}",200,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+API call,base url,path,give some params,expected response,status code,
+,,,,,,
+,,,,,,
+api call,url,port,path,payload,expected response,status code

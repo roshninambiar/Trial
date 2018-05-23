@@ -1,0 +1,1 @@
+GET,	 http://localhost, 3000,	 /posts/1, , src/test/input/posts-1.json,	200
