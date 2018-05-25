@@ -7,6 +7,7 @@ import io.restassured.module.jsv.JsonSchemaValidatorSettings;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -48,10 +49,20 @@ public class Get_example {
         while((read = bufferedReader.readLine())!= null){
             System.out.println(splitTheParams(read));
             ArrayList<String> arrayList = splitTheParams(read);
-            for(int j=0; j<arrayList.size(); j++) {
-                System.out.println(arrayList.get(j));
+
+            switch(arrayList.get(0)){
+                case "GET":
+                    getCall(arrayList.get(1), arrayList.get(2), arrayList.get(3), arrayList.get(4), arrayList.get(5), arrayList.get(6));
+                    break;
+
+                case "POST":
+                    //postcall();
+                    break;
+
+                case "PUT":
+                    //putcall();
+                    break;
             }
-            getCall(arrayList.get(1), arrayList.get(2), arrayList.get(3), arrayList.get(4), arrayList.get(5), arrayList.get(6));
             whenValidateResponseTime_thenSuccess(arrayList.get(1), arrayList.get(2), arrayList.get(3));
             whenLogRequest_thenOK(arrayList.get(1), arrayList.get(2), arrayList.get(3));
         }
@@ -81,10 +92,6 @@ public class Get_example {
                                 .setDefaultVersion(SchemaVersion.DRAFTV4).freeze())
                 .freeze();
 */
-        System.out.println("YELLOW");
-        String s = get(path).then().assertThat()
-                .body(matchesJsonSchemaInClasspath("posts-1.json")).toString();
-        System.out.println("YELLOW");
 
         System.out.println(finalresponse.getBody().asString());
         StringBuilder stringBuilder = new StringBuilder();
@@ -102,6 +109,7 @@ public class Get_example {
         RestAssured.port =  Integer.parseInt(port);
         String path = routepath;
         ValidatableResponse validatableResponse = when().get(path).then().time(lessThan(5000L));
+        System.out.println("OUTPUT: "+ validatableResponse.toString());
 
     }
 
@@ -116,7 +124,18 @@ public class Get_example {
                 .then().statusCode(200);
     }
 
+   @Test
+    public void givenUrl_whenJsonResponseConformsToSchema_thenCorrect() {
+        get("http://localhost:3000/posts/1")
+                .then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("posts-3.json"));
+    }
+
 }
+
+
+//                .body(matchesJsonSchemaInClasspath("posts-3.json"));
 
 /*
 when()
