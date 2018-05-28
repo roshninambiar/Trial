@@ -7,7 +7,7 @@ import io.restassured.module.jsv.JsonSchemaValidatorSettings;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
-import org.testng.Assert;
+import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -49,9 +50,10 @@ public class Get_example {
         while((read = bufferedReader.readLine())!= null){
             System.out.println(splitTheParams(read));
             ArrayList<String> arrayList = splitTheParams(read);
-
+            System.out.println("redredred");
             switch(arrayList.get(0)){
                 case "GET":
+                    System.out.println("redredredredredred");
                     getCall(arrayList.get(1), arrayList.get(2), arrayList.get(3), arrayList.get(4), arrayList.get(5), arrayList.get(6));
                     break;
 
@@ -92,6 +94,7 @@ public class Get_example {
                                 .setDefaultVersion(SchemaVersion.DRAFTV4).freeze())
                 .freeze();
 */
+        System.out.println("EXPECTED RESPONSE: "+ expectedResponse);
 
         System.out.println(finalresponse.getBody().asString());
         StringBuilder stringBuilder = new StringBuilder();
@@ -132,6 +135,14 @@ public class Get_example {
                 .body(matchesJsonSchemaInClasspath("posts-3.json"));
     }
 
+    @Test
+    public void  testresponsetime(){
+        Response finalresponse = expect()
+                .statusCode(200)
+                .when()
+                .get("http://localhost:3000/posts/1");
+        System.out.println(finalresponse.getTimeIn(TimeUnit.MILLISECONDS));
+    }
 }
 
 
